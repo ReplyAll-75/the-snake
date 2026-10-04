@@ -40,7 +40,68 @@ clock = pygame.time.Clock()
 
 
 # Тут опишите все классы игры.
-...
+class GameObject:
+    def __init__(self, position, body_color):
+        self.position = position
+        self.body_color = body_color
+
+    def draw(self):
+        pass
+
+class Apple(GameObject):
+    def __init__(self):
+        super().__init__((0, 0), APPLE_COLOR)
+        self.randomize_position()
+
+    def randomize_position(self):
+        self.position = (
+            randint(0, GRID_WIDTH - 1) * GRID_SIZE,
+            randint(0, GRID_HEIGHT - 1) * GRID_SIZE,
+        )
+
+    def draw(self):
+        rect = pygame.Rect(self.position, (GRID_SIZE, GRID_SIZE))
+        pygame.draw.rect(screen, self.body_color, rect)
+        pygame.draw.rect(screen, BORDER_COLOR, rect, 1)
+
+class Snake(GameObject):
+    def __init__(self):
+        position = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
+        super().__init__(position, SNAKE_COLOR)
+
+        self.length = 1
+        self.positions = [position]
+        self.direction = RIGHT
+        self.next_direction = None
+        self.last = None
+
+    def get_head_position(self):
+        return self.positions[0]
+
+    def move(self):
+        head_position = self.get_head_position()
+        direction_x, direction_y = self.direction
+
+        new_head_position = (
+            (head_position[0] + direction_x * GRID_SIZE) % SCREEN_WIDTH,
+            (head_position[1] + direction_y * GRID_SIZE) % SCREEN_HEIGHT,
+        )
+
+        self.positions.insert(0, new_head_position)
+
+        if len(self.positions) > self.length:
+            self.last = self.positions[-1]
+            self.positions.pop()
+
+    def draw(self):
+        for position in self.positions:
+            rect = pygame.Rect(position, (GRID_SIZE, GRID_SIZE))
+            pygame.draw.rect(screen, self.body_color, rect)
+            pygame.draw.rect(screen, BORDER_COLOR, rect, 1)
+
+        if self.last:
+            last_rect = pygame.Rect(self.last, (GRID_SIZE, GRID_SIZE))
+            pygame.draw.rect(screen, BOARD_BACKGROUND_COLOR, last_rect)
 
 
 def main():
