@@ -64,7 +64,9 @@ class Apple(GameObject):
     def randomize_position(self, occupied_positions=None):
         """Устанавливает яблоко в свободную случайную позицию."""
         if occupied_positions is None:
-            occupied_positions = []
+            occupied_positions = [
+                (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
+            ]
 
         while True:
             position = (
@@ -95,12 +97,12 @@ class Snake(GameObject):
 
     def move(self):
         """Перемещает змейку на одну клетку."""
-        head_position = self.get_head_position()
+        head_x, head_y = self.get_head_position()
         direction_x, direction_y = self.direction
 
         new_head_position = (
-            (head_position[0] + direction_x * GRID_SIZE) % SCREEN_WIDTH,
-            (head_position[1] + direction_y * GRID_SIZE) % SCREEN_HEIGHT,
+            (head_x + direction_x * GRID_SIZE) % SCREEN_WIDTH,
+            (head_y + direction_y * GRID_SIZE) % SCREEN_HEIGHT,
         )
 
         self.positions.insert(0, new_head_position)
@@ -140,12 +142,12 @@ def handle_keys(game_object):
             raise SystemExit
 
         if event.type == pygame.KEYDOWN:
-            direction = DIRECTION_MAP.get(
-                (event.key, game_object.direction)
+            game_object.update_direction(
+                DIRECTION_MAP.get(
+                    (event.key, game_object.direction),
+                    game_object.direction
+                )
             )
-
-            if direction:
-                game_object.update_direction(direction)
 
 
 def main():
